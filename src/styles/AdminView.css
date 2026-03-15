@@ -1,0 +1,40 @@
+.admin-view {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.stat-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.admin-table th {
+  letter-spacing: 0.05em;
+}
+
+.role-select {
+  cursor: pointer;
+}
+
+.role-select:focus {
+  outline: 2px solid #3b82f6;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-buttons button {
+  transition: all 0.2s;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  background: #f3f4f6;
+}
