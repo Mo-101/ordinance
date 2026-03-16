@@ -1,14 +1,14 @@
 .sidebar {
-  width: 260px;
+  width: 300px;
   background: linear-gradient(135deg, #1A2B4A 0%, #009ADE 100%);
-  min-height: calc(100vh - 116px);
+  min-height: calc(110vh - 116px);
   position: sticky;
   top: 0;
   display: flex;
   flex-direction: column;
-  padding: 20px 0;
+  padding:12px 0px;
   color: white;
-  z-index: 40;
+  z-index: 50;
 }
 
 .sidebar-logo {
@@ -19,15 +19,17 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
 }
 
 .sidebar-item {
   position: relative;
+  height: 50px;
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 12px 30px;
+  gap: 10px;
+  font-size: 14px;
+  padding:20px 30px;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
   transition: all 0.3s ease;

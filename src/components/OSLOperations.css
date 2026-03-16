@@ -1,0 +1,67 @@
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.mb-16 { margin-bottom: 16px; }
+.mt-12 { margin-top: 12px; }
+.mt-14 { margin-top: 14px; }
+
+.timeline.single { grid-template-columns: 1fr; }
+.dot.ready { background: #17b26a; }
+.dot.warn { background: #f79009; }
+
+.decision-actions,
+.card-title,
+.timeline,
+.osl-grid,
+.who-grid,
+.who-items table {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.osl-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 16px; }
+.decision-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.tiny-note { font-size: 12px; color: #7c879b; line-height: 1.6; }
+
+.osl-queue-table table { width: 100%; border-collapse: collapse; }
+.osl-queue-table thead th { text-align: left; padding: 14px 16px; color: #7c879b; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 1px solid #e8edf5; }
+.osl-queue-table tbody td { padding: 14px 16px; border-bottom: 1px solid #e8edf5; font-weight: 700; color: #1c2333; }
+.osl-queue-table tbody tr.selected { background: linear-gradient(90deg, #0c58f8, #246cff); color: white; }
+.status { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; }
+.status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+.timeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.timeline.single { grid-template-columns: 1fr; }
+.timeline-step { border: 1px solid #e8edf5; border-radius: 18px; padding: 16px; background: #fff; position: relative; }
+.timeline-step::before { content: ""; position: absolute; left: 18px; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: #c9d7ef; }
+.timeline-step.active::before { background: #0f5bff; }
+.timeline-step.done::before { background: #17b26a; }
+.timeline-step h4 { margin: 0 0 8px 22px; font-size: 14px; }
+.timeline-step p { margin: 0 0 0 22px; color: #7c879b; font-size: 12px; line-height: 1.6; }
+
+.who-form { background: #ffffff; color: #111827; border-radius: 22px; overflow: hidden; border: 2px solid #d9e7fb; box-shadow: 0 20px 40px rgba(16,24,40,0.08); }
+.who-topline { display: grid; grid-template-columns: 150px 1fr 210px; }
+.who-logo, .who-ref, .who-title { min-height: 48px; display: flex; align-items: center; }
+.who-logo { padding: 10px 14px; background: #ffffff; color: #0b83d8; font-weight: 900; font-size: 14px; border-bottom: 1px solid #d9e7fb; }
+.who-title { justify-content: center; background: #ffffff; color: #e02626; font-weight: 900; font-size: 26px; letter-spacing: 0.03em; text-transform: uppercase; border-bottom: 1px solid #d9e7fb; }
+.who-ref { justify-content: center; background: #ffffff; color: #111; font-weight: 900; font-size: 13px; text-align: center; padding: 8px 12px; border-bottom: 1px solid #d9e7fb; }
+.who-grid { display: grid; grid-template-columns: 1.15fr 0.65fr 0.75fr; }
+.who-cell { min-height: 34px; border-right: 1px solid #d9e7fb; border-top: 1px solid #d9e7fb; padding: 8px 10px; font-size: 12px; line-height: 1.35; background: #ffffff; }
+.who-cell.label { background: #f3f6fb; color: #111; font-weight: 800; }
+.who-cell.yellow { background: #ffffff; color: #111; font-weight: 800; }
+.who-cell.blue { background: #eef6ff; color: #111; font-weight: 800; }
+.who-cell.gray { background: #f7f8fa; color: #111; }
+.who-cell.center { text-align: center; }
+.who-cell.right { text-align: right; }
+.who-section-title { background: #11a7e8; color: #fff; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; padding: 9px 12px; border-top: 2px solid #ffffff; }
+.who-items table { width: 100%; background: #ffffff; color: #111827; border-collapse: collapse; }
+.who-items thead th { background: #f3f6fb; color: #111; border-right: 1px solid #d9e7fb; border-bottom: 1px solid #d9e7fb; padding: 8px 10px; font-size: 11px; text-transform: none; }
+.who-items tbody td { border-right: 1px solid #d9e7fb; border-bottom: 1px solid #d9e7fb; padding: 7px 10px; font-size: 12px; }
+.who-items tbody tr:nth-child(even) td { background: #fafcff; }
+.who-signoff { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 2px solid #11a7e8; }
+.who-sign { min-height: 88px; border-right: 1px solid #d9e7fb; position: relative; }
+.who-sign:last-child { border-right: 0; }
+.who-sign span { position: absolute; left: 0; right: 0; top: 10px; text-align: center; color: #8b6d00; font-size: 12px; font-style: italic; font-weight: 800; }

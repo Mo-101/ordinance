@@ -6,7 +6,7 @@
     "usedFor": "Laboratory analysis and diagnostic testing for 13 different parameters",
     "price": "$0.00",
     "category": "Biomedical Consumables",
-    "image": "/images/real/chemistry-piccolo-analyzer.png",
+    "image": "/public/images/piccolo-analyzer.png",
     "status": "Normal",
     "model3d": "chemistry_analyzer_piccolo_xpress"
   },
@@ -2875,4 +2875,10 @@
     "name": "Set",
     "description": "Set, Tunic + Trousers Surgical, Woven, Reusable, Green, Size L",
     "usedFor": "Surgical attire",
-    "price
+    "price": "$0.00",
+    "category": "PPE",
+    "image": "https://source.unsplash.com/featured/?Surgical%20Scrubs",
+    "status": "Normal",
+    "model3d": "set_tunic_trousers_surgical"
+  }
+]

@@ -116,33 +116,36 @@ export const INITIAL_ORDERS = [
 
 export const TOP_NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard' },
-  { id: 'products', label: 'Products' },
-  { id: 'supply-chain', label: 'Supply Chain' },
+  { id: 'catalog', label: 'Catalog' },
+  { id: 'orders', label: 'Orders' },
+  { id: 'osl', label: 'OSL Operations' },
+  { id: 'inventory', label: 'Inventory' },
   { id: 'laboratory', label: 'Laboratory' },
   { id: 'admin', label: 'Admin' },
 ];
 
 export const SIDEBAR_NAV_ITEMS: Record<string, { id: string, label: string, icon?: string }[]> = {
-  'dashboard': [
+  dashboard: [
     { id: 'overview', label: 'Overview' },
     { id: 'analytics', label: 'Analytics' },
   ],
-  'products': [
-    { id: 'catalog', label: 'Catalog' },
-    { id: 'categories', label: 'Categories' },
+  catalog: [
+    { id: 'catalog', label: 'Product Catalog' },
   ],
-  'supply-chain': [
+  orders: [
     { id: 'orders', label: 'Orders' },
-    { id: 'drafts', label: 'Draft Orders' },
+    { id: 'drafts', label: 'Drafts' },
+  ],
+  osl: [
     { id: 'osl-operations', label: 'OSL Operations' },
-    { id: 'inventory', label: 'Inventory' },
-    { id: 'warehouse', label: 'Warehouse' },
   ],
-  'laboratory': [
-    { id: 'lab-dashboard', label: 'Lab Dashboard' },
-    { id: 'controls', label: 'Controls' },
+  inventory: [
+    { id: 'inventory', label: 'Inventory Management' },
   ],
-  'admin': [
+  laboratory: [
+    { id: 'lab-dashboard', label: 'Laboratory' },
+  ],
+  admin: [
     { id: 'admin-dashboard', label: 'Admin Dashboard' },
     { id: 'users', label: 'User Management' },
     { id: 'settings', label: 'Settings' },
@@ -153,8 +156,10 @@ export const getNavItems = (role: string) => {
   // This function is now used for Top Nav
   const baseItems = [
     { id: 'dashboard', label: 'Dashboard' },
-    { id: 'products', label: 'Products' },
-    { id: 'supply-chain', label: 'Supply Chain' },
+    { id: 'catalog', label: 'Catalog' },
+    { id: 'orders', label: 'Orders' },
+    { id: 'osl', label: 'OSL Operations' },
+    { id: 'inventory', label: 'Inventory' },
   ];
 
   if (role === 'Laboratory Team' || role === 'Super Admin') {

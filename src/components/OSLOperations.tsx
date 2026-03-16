@@ -1,13 +1,7 @@
-import React from 'react';
 import { motion } from 'motion/react';
-import { AlertCircle } from 'lucide-react';
+import './OSLOperations.css';
+import { Order } from '../types';
 
-interface Order {
-  id: string;
-  ref: string;
-  name: string;
-  status: string;
-}
 
 interface OSLOperationsProps {
   orders: Order[];
@@ -23,87 +17,81 @@ function OSLOperations({ orders, onUpdateStatus }: OSLOperationsProps) {
       animate={{ opacity: 1 }}
       className="space-y-6"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden !p-0">
-            <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h3 className="text-lg font-bold">Pending Operations Queue</h3>
-              <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-wider">
-                {submittedOrders.length} Ready for Review
-              </span>
+
+      <div className="card mb-16">
+          <div className="card-title"><h3>OSL decision lane</h3><span className="subtle">Approve, clarify, release</span></div>
+          <div className="decision-actions">
+            <button className="link-btn" id="oslStartReviewBtn">Start review</button>
+            <button className="link-btn" id="oslClarifyBtn">Send clarification pack</button>
+            <button className="link-btn primary" id="oslApproveBtn">Approve request</button>
+            <button className="ghost-btn" id="oslReleaseBtn">Release stock</button>
+          </div>
+          <div className="tiny-note mt-12">Best method: exception-only review with a structured clarification pack, not full rejection. Reviewer flags only the broken fields, requester amends only those fields, system preserves chain of custody, then approval locks the record.</div>
+        </div>
+
+        <div className="osl-grid">
+          <div className="card osl-queue-table">
+            <div className="card-title"><h3>Pending operations queue</h3><span className="subtle">Validated requests</span></div>
+            <table>
+              <thead><tr><th>Ref</th><th>Requester</th><th>Country</th><th>Status</th><th>Window</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr className="selected"><td id="oslQueueRef">OR_24-001_Kenya</td><td id="oslQueueRequester">Ava Lewis</td><td>Kenya</td><td><span className="status"><span className="dot ready"></span>Ready for review</span></td><td id="oslQueueWindow">1h window</td><td><button className="link-btn primary" id="approveToStockBtn">Send to stock release</button></td></tr>
+                <tr><td>OR_24-008_Uganda</td><td>Leah Morris</td><td>Uganda</td><td><span className="status"><span className="dot warn"></span>Adjustment window</span></td><td>18 min left</td><td><button className="link-btn">Monitor</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="card">
+            <div className="card-title"><h3>Process timeline</h3><span className="subtle">Real-time flow</span></div>
+            <div className="timeline single" id="oslTimeline">
+              <div className="timeline-step done"><h4>Requester sent validated order</h4><p id="oslTimelineRef">OR_24-001_Kenya entered the OSL lane with complete mandatory fields.</p></div>
+              <div className="timeline-step active"><h4>OSL review in progress</h4><p>Operations confirms requester ref, shipment method, consignee data, and item lines.</p></div>
+              <div className="timeline-step"><h4>Approval & stock release</h4><p>Once approved, the stock release document is generated and request becomes locked.</p></div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50/30">
-                    <th className="px-6 py-4 text-[11px] uppercase tracking-wider text-gray-400 font-bold">Ref</th>
-                    <th className="px-6 py-4 text-[11px] uppercase tracking-wider text-gray-400 font-bold">Requester</th>
-                    <th className="px-6 py-4 text-[11px] uppercase tracking-wider text-gray-400 font-bold">Country</th>
-                    <th className="px-6 py-4 text-[11px] uppercase tracking-wider text-gray-400 font-bold">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {submittedOrders.length > 0 ? submittedOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 font-bold">{order.ref}</td>
-                      <td className="px-6 py-4 font-bold">{order.name}</td>
-                      <td className="px-6 py-4 font-bold">{order.ref.split('_')[2] || 'Global'}</td>
-                      <td className="px-6 py-4">
-                        <button 
-                          onClick={() => onUpdateStatus(order.id, 'approved')}
-                          className="px-4 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-xs hover:bg-emerald-700 shadow-md"
-                        >
-                          Approve & Release
-                        </button>
-                      </td>
-                    </tr>
-                  )) : (
-                    <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-gray-400 font-bold italic">
-                        No pending requests in queue.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <div className="tiny-note mt-14">No send-back loop here. Clarifications stay inside ops review while request integrity is preserved.</div>
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
-            <h3 className="text-lg font-bold">Process Timeline</h3>
-            <div className="space-y-6 relative before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-100">
-              {[
-                { title: 'Order Validated', desc: 'Requester completed mandatory fields.', status: 'done' },
-                { title: 'OSL Review', desc: 'Operations confirming shipment data.', status: 'active' },
-                { title: 'Stock Release', desc: 'Generating warehouse release document.', status: 'pending' }
-              ].map((step, i) => (
-                <div key={i} className="relative pl-8">
-                  <div className={`absolute left-0 top-1.5 w-5 h-5 rounded-full border-4 border-white shadow-sm ${step.status === 'done' ? 'bg-emerald-500' : step.status === 'active' ? 'bg-blue-500' : 'bg-gray-200'}`} />
-                  <div className="text-sm font-bold">{step.title}</div>
-                  <div className="text-xs text-gray-500 mt-1">{step.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="p-5 bg-blue-50 rounded-2xl border border-blue-100 text-blue-800 text-sm leading-relaxed">
-            <div className="flex gap-3">
-              <AlertCircle size={20} className="shrink-0" />
-              <p><strong>Note:</strong> Once approved, the request locks and a Material Stock Release document is generated automatically.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        <div className="who-form" id="stockReleaseForm">
+          <div className="who-topline">
+            <div className="who-logo">World Health Organization</div>
+            <div className="who-title">Material stock release</div>
+            <div className="who-ref" id="srRefTop">REF: SR_from_OR_24-001_Kenya</div>
+       </div>
 
-      {/* Stock Release Form Preview (Mock) */}
-      <div className="bg-white border-2 border-[#d9e7fb] rounded-xl overflow-hidden shadow-xl opacity-50 grayscale pointer-events-none">
-        <div className="bg-emerald-600 text-white px-4 py-2 text-xs font-black uppercase tracking-widest">Material Stock Release Preview</div>
-        <div className="p-12 text-center font-black text-gray-300 uppercase tracking-widest text-4xl">
-          Stock Release Document<br/>Generated Upon Approval
+          <div className="who-grid">
+            <div className="who-cell yellow"><b>From:</b><br /><span id="srFrom">AFRO Emergency Hub Nairobi, Sierra Leone Country Office</span></div>
+            <div className="who-cell label right"><b>Mode of shipment:</b><br /><span id="srMode">Air freight</span></div>
+            <div className="who-cell blue center"><b>Date</b><br /><span id="srDate">05-Aug-26</span></div>
+
+            <div className="who-cell"><b>To / processing unit:</b><br />OSL warehouse release desk</div>
+            <div className="who-cell label right"><b>Estimated weight (kg):</b><br /><span id="srWeight">24</span></div>
+            <div className="who-cell blue"><b>Requested ref:</b><br /><span id="srRequesterRef">REQ-EM-001</span></div>
+
+            <div className="who-cell"><b>Notify party:</b><br /><span id="srNotify">NBO hub dispatch, field logistics, warehouse control</span></div>
+            <div className="who-cell label right"><b>Estimated volume (cbm):</b><br /><span id="srVolume">0.8</span></div>
+            <div className="who-cell blue"><b>Conf. ready date:</b><br /><span id="srReadyDate">05-Aug-26</span></div>
+
+            <div className="who-cell"><b>Shipping dimensions:</b><br /><span id="srDimensions">Release against approved OR_24-001. Item lines and quantity carried from approved order request.</span></div>
+            <div className="who-cell label right"><b>Freight charges payable:</b><br />WHO</div>
+            <div className="who-cell gray"><b>Shipping documents required:</b><br />packing list, release note, airway bill copy</div>
+          </div>
+          <div className="who-section-title">Released stock lines</div>
+          <div className="who-items">
+            <table>
+              <thead>
+                <tr><th>#</th><th>WHO code</th><th>WHO description</th><th>UoM</th><th>Qty</th><th>Batch</th><th>Expiry</th><th>Unit price</th><th>Total price</th><th>Comments</th></tr>
+              </thead>
+              <tbody id="stockReleaseBody">
+                <tr><td>1</td><td>ERK-204</td><td>Emergency Response Kit</td><td>kit</td><td>2</td><td>EK-204-B1</td><td>2029-03</td><td>149.00</td><td>298.00</td><td>awaiting approval</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="who-signoff">
+            <div className="who-sign"><span>In charge of supply</span></div>
+            <div className="who-sign"><span>Control/regulatory</span></div>
+            <div className="who-sign"><span>Approver</span></div>
+          </div>
         </div>
-      </div>
     </motion.div>
   );
 }

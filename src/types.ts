@@ -42,5 +42,6 @@ export interface Order {
   weight: number;
   volume: number;
   remarks: string;
+  createdAt?: number;
   items: { product: Product, qty: number }[];
 }
