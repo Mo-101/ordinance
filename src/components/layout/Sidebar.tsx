@@ -15,8 +15,8 @@ import {
   Warehouse,
   Boxes
 } from 'lucide-react';
-import { SIDEBAR_NAV_ITEMS } from '../constants';
-import '../styles/Sidebar.css';
+import { SIDEBAR_NAV_ITEMS } from '../../constants';
+import '../../styles/Sidebar.css';
 
 interface SidebarProps {
   activeTopTab: string;

@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import './OSLOperations.css';
-import { Order } from '../types';
+import { Order } from '../../types';
 
 
 interface OSLOperationsProps {

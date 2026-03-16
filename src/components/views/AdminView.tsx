@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { adminAPI, countriesAPI, warehouseAPI } from '../services/api';
-import { formatDateTime } from '../utils/helpers';
+import { adminAPI, countriesAPI, warehouseAPI } from '../../services/api';
+import { formatDateTime } from '../../utils/helpers';
 import WarehouseManagement from './WarehouseManagement';
-import ClearOrdersModal from './modals/ClearOrdersModal';
-import Loading from './Loading';
-import '../styles/AdminView.css';
+import ClearOrdersModal from '../modals/ClearOrdersModal';
+import Loading from '../layout/Loading';
+import '../../styles/AdminView.css';
 
 // OSL Admin Level labels
 const OSL_LEVELS = [

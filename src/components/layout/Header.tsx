@@ -1,7 +1,7 @@
 import React from 'react';
-import { getNavItems } from '../constants';
+import { getNavItems } from '../../constants';
 import NotificationBell from './NotificationBell';
-import '../styles/Header.css';
+import '../../styles/Header.css';
 
 interface HeaderProps {
   currentUser: {

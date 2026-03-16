@@ -5,17 +5,17 @@
 
 import React, { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { 
-  Header, 
+import {
+  Header,
   Sidebar,
-  Dashboard, 
-  CatalogView, 
-  OrdersView, 
-  OSLOperations, 
+  Dashboard,
+  CatalogView,
+  OrdersView,
+  OSLOperations,
   AdminView,
-  WarehouseManagement
+  WarehouseManagement,
 } from './components';
-import OrderDetailPage from './components/OrderDetailPage';
+import OrderDetailPage from './components/views/OrderDetailPage';
 import rawInventory from '../data/inventory.json';
 import { COMMODITIES, INITIAL_ORDERS } from './constants';
 import { Product, Order, OrderStatus } from './types';
