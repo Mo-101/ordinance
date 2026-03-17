@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Package, MapPin, AlertTriangle, ChevronRight, Search, Filter } from 'lucide-react';
-import { warehouseAPI } from '../services/api';
-import Loading from './Loading';
+import { warehouseAPI } from "../../services/api";
+import Loading from "../layout/Loading";
 import toast from 'react-hot-toast';
 
 function WarehouseManagement() {

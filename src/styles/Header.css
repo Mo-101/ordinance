@@ -6,7 +6,7 @@
 
 .header-container {
   max-width: 1200px;
-  margin-top: o;
+  margin-top: 0;
   margin-left: auto;
   margin-right: auto;
   padding: 16px 24px;
@@ -48,6 +48,46 @@
   display: flex;
   align-items: center;
   gap: 20px;
+}
+
+.header-profile-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-profile-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.header-profile-image:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.05);
+}
+
+.header-profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.header-profile-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+}
+
+.header-profile-role {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
 }
 
 .header-user-info {

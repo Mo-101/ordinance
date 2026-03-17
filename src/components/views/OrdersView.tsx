@@ -1,5 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { Order } from '../../types';
+import { motion } from 'framer-motion';
+import { Order, OrderState } from '../../types';
+import { ordersAPI } from '../../services/api';
+import CoordinatorPanel from '../CoordinatorPanel';
+import SourcingOptionsModal from '../SourcingOptionsModal';
+import toast from 'react-hot-toast';
+import { OrderStateMachine } from '../../engine/order-state-machine.v2';
+import '../../styles/OrdersView.css';
 
 interface OrdersViewProps {
   orders: Order[];
@@ -35,7 +42,7 @@ const statusColor = (status: string) => {
   return '#94a3b8';
 };
 
-const statusDotClass = (status: string) => {
+const statusDotclassName = (status: string) => {
   const s = status.toLowerCase();
   if (s.includes('draft') || s.includes('pending')) return 'bg-amber-500';
   if (s.includes('submit')) return 'bg-indigo-500';
@@ -46,6 +53,9 @@ const statusDotClass = (status: string) => {
 
 function OrdersView({ orders, onUpdateStatus, selectedOrderId, setSelectedOrderId }: OrdersViewProps) {
   const [activeTab, setActiveTab] = useState<Tab>('all');
+  const [showCoordinator, setShowCoordinator] = useState(false);
+  const [showSourcingModal, setShowSourcingModal] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const filteredOrders = useMemo(() => {
     if (activeTab === 'all') return orders;
@@ -65,177 +75,341 @@ function OrdersView({ orders, onUpdateStatus, selectedOrderId, setSelectedOrderI
     setSelectedOrderId?.(id);
   };
 
+  const handleStateTransition = async (orderId: string, toState: OrderState, actor: string, reason?: string) => {
+    setIsTransitioning(true);
+    try {
+      const transition = OrderStateMachine.transition(
+        selected?.status as OrderState || 'draft',
+        toState,
+        actor,
+        reason
+      );
+      
+      const response = await ordersAPI.transition(orderId, toState, actor, reason);
+      if (response.success) {
+        toast.success(`Order ${transition.from} → ${transition.to}`);
+        onUpdateStatus(orderId, toState as Order['status']);
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Transition failed');
+    } finally {
+      setIsTransitioning(false);
+    }
+  };
+
+  const getAvailableActions = (order: Order) => {
+    const currentStatus = order.status as OrderState;
+    const actions: { label: string; state: OrderState; actor: string; color: string }[] = [];
+
+    // Country actions
+    if (currentStatus === 'draft') {
+      actions.push({ label: 'Submit', state: 'submitted', actor: 'country', color: 'blue' });
+    }
+    if (currentStatus === 'submitted') {
+      actions.push({ label: 'Cancel', state: 'cancelled', actor: 'country', color: 'red' });
+    }
+    if (currentStatus === 'awaiting_country_decision') {
+      actions.push({ label: 'View Options', state: 'awaiting_country_decision', actor: 'country', color: 'purple' });
+    }
+
+    // Coordinator actions
+    if (currentStatus === 'submitted') {
+      actions.push({ label: 'Coordinate', state: 'coordination_exception', actor: 'coordinator', color: 'yellow' });
+    }
+
+    // OSL actions
+    if (currentStatus === 'under_osl_review') {
+      actions.push({ label: 'Reserve Stock', state: 'stock_reserved', actor: 'osl_ops', color: 'green' });
+    }
+    if (currentStatus === 'stock_reserved') {
+      actions.push({ label: 'Release Stock', state: 'stock_released', actor: 'osl_ops', color: 'blue' });
+    }
+    if (currentStatus === 'stock_released') {
+      actions.push({ label: 'Dispatch', state: 'dispatched', actor: 'osl_ops', color: 'purple' });
+    }
+
+    return actions;
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900">Orders</h1>
-          <p className="text-sm text-slate-500">Manage requests, drafts, approvals, and releases.</p>
+    <div className="orders-view-container">
+      <div className="orders-header-section">
+        <div className="orders-header-title">
+          <h1>Order Request</h1>
+          <p>Submit and manage emergency supply requests.</p>
         </div>
-        <div className="flex gap-2">
-          {(['all', 'dispatch', 'pending', 'complete'] as Tab[]).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-                activeTab === tab ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 border border-slate-200'
-              }`}
-            >
-              {tab === 'all' ? 'All' : tab === 'dispatch' ? 'Dispatch' : tab === 'pending' ? 'Pending' : 'Complete'}
-            </button>
-          ))}
+        <div className="orders-header-actions">
+          <button className="orders-tab-btn active">New Request</button>
+          <button className="orders-tab-btn">Submitted</button>
+          <button className="orders-tab-btn">In Review</button>
+          <button className="orders-tab-btn">Approved</button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-              <div className="text-sm font-bold text-slate-700">Orders List</div>
-              <div className="text-xs text-slate-500">{filteredOrders.length} record(s)</div>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 text-slate-500 uppercase text-[11px] tracking-wide">
-                  <tr>
-                    <th className="px-4 py-3">Ref</th>
-                    <th className="px-4 py-3">Requester</th>
-                    <th className="px-4 py-3">Date</th>
-                    <th className="px-4 py-3">Value</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {filteredOrders.map((order) => (
-                    <tr key={order.id} className={selected?.id === order.id ? 'bg-blue-50/60' : 'hover:bg-slate-50'}>
-                      <td className="px-4 py-3 font-bold text-slate-800">{order.ref || order.id}</td>
-                      <td className="px-4 py-3 text-slate-700">{order.name}</td>
-                      <td className="px-4 py-3 text-slate-600">{order.date}</td>
-                      <td className="px-4 py-3 text-slate-800">${order.value?.toFixed?.(2) || '0.00'}</td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center gap-2 text-sm font-semibold" aria-label={`Status ${friendlyStatus(order.status)}`}>
-                          <span className={`h-2.5 w-2.5 rounded-full ${statusDotClass(order.status)}`} />
-                          {friendlyStatus(order.status)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => handleSelect(order.id)}
-                          className="text-blue-600 font-bold text-sm hover:underline"
-                        >
-                          Open
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {filteredOrders.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="px-4 py-6 text-center text-slate-400 font-medium">No orders in this view.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+      <div className="order-request-form">
+        {/* WHO Header */}
+        <div className="who-header">
+          <div className="who-logo-section">
+            <div className="who-logo">WHO</div>
+            <div className="who-org">World Health Organization</div>
+          </div>
+          <div className="who-title-section">
+            <div className="who-title">Emergency</div>
+            <div className="who-subtitle">ORDINARY REQUEST</div>
+          </div>
+          <div className="who-ref-section">
+            <div className="who-ref-label">REF:</div>
+            <div className="who-ref-value">OR_24-001_Kenya</div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="form-actions-header">
+          <div className="countdown-timer">
+            <span className="timer-icon">⏰</span>
+            <span className="timer-text">01:00:00</span>
+          </div>
+          <div className="header-buttons">
+            <button className="header-btn secondary">Back to orders</button>
+            <button className="header-btn secondary">Save draft</button>
+            <button className="header-btn primary">Validate & send</button>
+          </div>
+        </div>
+
+        {/* Workflow Notice */}
+        <div className="workflow-notice">
+          <div className="notice-title">
+            <strong>Workflow guardrail</strong>
+          </div>
+          <div className="notice-text">
+            Mandatory fields must validate before submit. After submission, the request stays editable for 1 hour. Once OSL Operations approves it, the request locks and only stock release can proceed.
+          </div>
+        </div>
+
+        {/* Request Status */}
+        <div className="request-status-section">
+          <h3 className="section-heading">Request status</h3>
+          <div className="status-info">
+            <div className="status-ref">Order #OR-24-001</div>
+            <div className="status-pills">
+              <span className="status-pill draft">Draft validated</span>
+              <span className="status-pill window">1h adjustment window</span>
+              <span className="status-pill pending">Awaiting OSL review</span>
             </div>
           </div>
         </div>
 
-        <div>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-xs uppercase font-bold text-slate-400">Selected Order</div>
-                <div className="text-lg font-black text-slate-900">{selected?.ref || selected?.id || '—'}</div>
-              </div>
-              {selected && (
-                <span className="inline-flex items-center gap-2 rounded-full bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700">
-                  <span className={`h-2.5 w-2.5 rounded-full ${statusDotClass(selected.status)}`} />
-                  {friendlyStatus(selected.status)}
-                </span>
-              )}
+        {/* Checkout Summary */}
+        <div className="checkout-summary-section">
+          <h3 className="section-heading">Checkout summary</h3>
+          <div className="summary-grid">
+            <div className="summary-item">
+              <span className="summary-label">Cart items</span>
+              <span className="summary-value">1 line</span>
             </div>
-
-            {selected ? (
-              <div className="space-y-3 text-sm text-slate-700">
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <div className="text-xs uppercase font-bold text-slate-400">Requester</div>
-                    <div className="font-semibold text-slate-900">{selected.name}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs uppercase font-bold text-slate-400">Consignee</div>
-                    <div className="text-slate-800">{selected.consignee || 'N/A'}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs uppercase font-bold text-slate-400">Shipment Mode</div>
-                    <div className="text-slate-800">{selected.shipmentMode || 'N/A'}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs uppercase font-bold text-slate-400">Notify</div>
-                    <div className="text-slate-800">{selected.notify || 'N/A'}</div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs uppercase font-bold text-slate-400">Remarks</div>
-                  <div className="text-slate-700 leading-relaxed">{selected.remarks || 'No remarks'}</div>
-                </div>
-
-                <div>
-                  <div className="text-xs uppercase font-bold text-slate-400 mb-2">Items</div>
-                  <div className="border border-slate-100 rounded-xl overflow-hidden">
-                    <table className="w-full text-xs">
-                      <thead className="bg-slate-50 text-slate-500 uppercase tracking-wide">
-                        <tr>
-                          <th className="px-3 py-2 text-left">Item</th>
-                          <th className="px-3 py-2 text-left">SKU</th>
-                          <th className="px-3 py-2 text-center">Qty</th>
-                          <th className="px-3 py-2 text-right">Price</th>
-                          <th className="px-3 py-2 text-right">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 text-slate-700">
-                        {selected.items?.map((item, idx) => (
-                          <tr key={idx}>
-                            <td className="px-3 py-2 font-semibold">{item.product.name}</td>
-                            <td className="px-3 py-2 text-slate-500">{item.product.sku}</td>
-                            <td className="px-3 py-2 text-center">{item.qty}</td>
-                            <td className="px-3 py-2 text-right">${item.product.price.toFixed(2)}</td>
-                            <td className="px-3 py-2 text-right">${(item.qty * item.product.price).toFixed(2)}</td>
-                          </tr>
-                        )) || (
-                          <tr>
-                            <td colSpan={5} className="px-3 py-3 text-center text-slate-400">No items</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <button
-                    onClick={() => selected && onUpdateStatus(selected.id, 'approved' as Order['status'])}
-                    className="flex-1 rounded-xl bg-emerald-600 text-white font-bold py-2 text-sm hover:bg-emerald-700"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => selected && onUpdateStatus(selected.id, 'draft' as Order['status'])}
-                    className="flex-1 rounded-xl bg-amber-500 text-white font-bold py-2 text-sm hover:bg-amber-600"
-                  >
-                    Send Back
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="text-sm text-slate-500">Select an order to view details.</div>
-            )}
+            <div className="summary-item">
+              <span className="summary-label">Units</span>
+              <span className="summary-value">2</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Estimated value</span>
+              <span className="summary-value">$310</span>
+            </div>
+            <div className="summary-item total">
+              <span className="summary-label">Route</span>
+              <span className="summary-value">Order Request → OSL Operations</span>
+            </div>
           </div>
         </div>
+
+        {/* WHO Form Grid */}
+        <div className="who-form-grid">
+          <div className="form-row">
+            <div className="form-cell yellow">
+              <label className="form-label">From (initiator):</label>
+              <input className="form-input" defaultValue="OSL Emergency Response Unit" />
+            </div>
+            <div className="form-cell label">
+              <label className="form-label">Mode of shipment:</label>
+              <input className="form-input" defaultValue="Air freight" />
+            </div>
+            <div className="form-cell blue">
+              <label className="form-label">PTEAO</label>
+              <input className="form-input" placeholder="Enter PTEAO" />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-cell yellow">
+              <label className="form-label">Consignee address:</label>
+              <textarea className="form-textarea" defaultValue={`World Health Organization
+Office of the WHO Representative
+Kenya Response Desk`} />
+            </div>
+            <div className="form-cell label">
+              <label className="form-label">Nb of lines:</label>
+              <div className="form-value">1</div>
+            </div>
+            <div className="form-cell blue">
+              <label className="form-label">Estimated total cost:</label>
+              <div className="form-value">USD 310.00</div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-cell gray">
+              <label className="form-label">To (processing unit):</label>
+              <div className="form-value">OSL Operations Desk</div>
+            </div>
+            <div className="form-cell label">
+              <label className="form-label">Estimated goods cost:</label>
+              <div className="form-value">USD 298.00</div>
+            </div>
+            <div className="form-cell blue">
+              <label className="form-label">Requester ref:</label>
+              <input className="form-input" defaultValue="REQ-EM-001" />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-cell">
+              <label className="form-label">Notify party:</label>
+              <textarea className="form-textarea" defaultValue={`osl.emergency@who.int
+ava.lewis@who.int
+wro.logistics@who.int`} />
+            </div>
+            <div className="form-cell label">
+              <label className="form-label">Requested ready on:</label>
+              <input className="form-input" defaultValue="05-Aug-26" />
+            </div>
+            <div className="form-cell blue">
+              <label className="form-label">Confirmed ready date:</label>
+              <div className="form-value">Pending OSL</div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-cell">
+              <label className="form-label">Shipping dimensions:</label>
+              <textarea className="form-textarea" defaultValue="Auto-generated from selected item and quantity." />
+            </div>
+            <div className="form-cell label">
+              <label className="form-label">Estimated weight (kg):</label>
+              <div className="form-value">24</div>
+            </div>
+            <div className="form-cell blue">
+              <label className="form-label">Confirmed weight:</label>
+              <div className="form-value">Pending OSL</div>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-cell">
+              <label className="form-label">Remarks:</label>
+              <textarea className="form-textarea" defaultValue="Draft created from checkout. Awaiting requester validation and submit." />
+            </div>
+            <div className="form-cell label">
+              <label className="form-label">Estimated volume (cbm):</label>
+              <div className="form-value">0.8</div>
+            </div>
+            <div className="form-cell blue">
+              <label className="form-label">Confirmed volume:</label>
+              <div className="form-value">Pending OSL</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Items */}
+        <div className="order-items-section">
+          <h3 className="section-heading">Order request line items</h3>
+          <div className="items-table-container">
+            <table className="items-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>WHO code</th>
+                  <th>WHO description</th>
+                  <th>UoM</th>
+                  <th>Quantity</th>
+                  <th>Unit price USD</th>
+                  <th>Total amount</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>ERK-204</td>
+                  <td>Emergency Response Kit</td>
+                  <td>kit</td>
+                  <td>2</td>
+                  <td>149.00</td>
+                  <td>298.00</td>
+                  <td>checkout populated</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Mini KPI Grid */}
+        <div className="mini-kpi-grid">
+          <div className="mini-kpi">
+            <span className="kpi-label">Cart lines</span>
+            <span className="kpi-value">1</span>
+          </div>
+          <div className="mini-kpi">
+            <span className="kpi-label">Editable until</span>
+            <span className="kpi-value">01:00:00</span>
+          </div>
+          <div className="mini-kpi">
+            <span className="kpi-label">Current state</span>
+            <span className="kpi-value">Draft</span>
+          </div>
+        </div>
+
+        {/* WHO Sign-off */}
+        <div className="who-signoff-section">
+          <div className="signoff-labels">
+            <span className="signoff-label">In charge of supply</span>
+            <span className="signoff-label">Reviewer</span>
+            <span className="signoff-label">Approver</span>
+          </div>
+          <div className="signoff-lines">
+            <div className="signoff-line"></div>
+            <div className="signoff-line"></div>
+            <div className="signoff-line"></div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="form-navigation">
+          <button className="nav-btn">Back to dashboard</button>
+          <button className="nav-btn">Open requests</button>
+          <button className="nav-btn primary">Add more products</button>
+        </div>
       </div>
+
+      {/* Modals */}
+      {showCoordinator && selected && (
+        <CoordinatorPanel
+          orderId={selected.id}
+          onClose={() => setShowCoordinator(false)}
+        />
+      )}
+
+      {showSourcingModal && selected && (
+        <SourcingOptionsModal
+          isOpen={showSourcingModal}
+          onClose={() => setShowSourcingModal(false)}
+          orderId={selected.id}
+          orderNumber={selected.ref || selected.id}
+          options={[]} // Would be populated from API
+          onResponse={() => setShowSourcingModal(false)}
+        />
+      )}
     </div>
   );
-}
+};
 
 export default OrdersView;

@@ -34,12 +34,19 @@ function Header({ currentUser, activeTab, setActiveTab, onLogout, onProfileSetti
 
         {/* User Info */}
         <div className="header-user">
-          <div className="header-user-info">
-            <div className="header-user-name">
-              {currentUser.name}
-              {currentUser.country && <span className="header-user-country">, {currentUser.country}</span>}
+          <div className="header-profile-container">
+            <img 
+              src="https://picsum.photos/seed/user-avatar/40/40.jpg" 
+              alt="Profile" 
+              className="header-profile-image"
+            />
+            <div className="header-profile-info">
+              <div className="header-profile-name">
+                {currentUser.name}
+                {currentUser.country && <span>, {currentUser.country}</span>}
+              </div>
+              <div className="header-profile-role">{currentUser.role}</div>
             </div>
-            <div className="header-user-role">{currentUser.role}</div>
           </div>
           <NotificationBell onOrderClick={onOrderClick} />
           <button onClick={onProfileSettings} className="header-profile-btn" title="Profile Settings">

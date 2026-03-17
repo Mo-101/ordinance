@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Product } from '../../types';
 
@@ -372,7 +372,7 @@ function CatalogView({
         </div>
       </section>
 
-      {mappedCatalogProduct && (
+      {showDetail && (
         <section className={`products-detail-page ${showDetail ? 'active' : ''}`} id="productsDetailPage">
           <div className="section-nav full-span">
             <button className="ghost-btn">Dashboard</button>
@@ -381,95 +381,109 @@ function CatalogView({
             <button className="ghost-btn" onClick={() => setShowDetail(false)}>Back to catalog</button>
           </div>
 
-          <div className="card detail-visual">
-            <div className="eyebrow detail-eyebrow">Item detail</div>
-            <div className={`product-shape ${mappedCatalogProduct.shape}`} id="detailShape"></div>
-          </div>
-
-          <div className="order-panel">
-            <div className="card detail-summary">
-              <div className="detail-title">
-                <h2 id="detailName">{mappedCatalogProduct.name}</h2>
-                <p id="detailSummary">{mappedCatalogProduct.description}</p>
+          {mappedCatalogProduct ? (
+            <>
+              <div className="card detail-visual">
+                <div className="eyebrow detail-eyebrow">Item detail</div>
+                <div className={`product-shape ${mappedCatalogProduct.shape}`} id="detailShape"></div>
               </div>
 
-              <div className="products-head no-padding">
-                <div className="price-block left-align">
-                  <strong id="detailPrice">
-                    {currencySymbols[currency]}{mappedCatalogProduct.prices[currency]}
-                  </strong>
-                  <span id="detailPriceMeta">per kit • tax excluded</span>
-                </div>
-                <span className="chip" id="detailCategory">{mappedCatalogProduct.category}</span>
-              </div>
+              <div className="order-panel">
+                <div className="card detail-summary">
+                  <div className="detail-title">
+                    <h2 id="detailName">{mappedCatalogProduct.name}</h2>
+                    <p id="detailSummary">{mappedCatalogProduct.description}</p>
+                  </div>
 
-              <div className="detail-grid">
-                <div className="detail-cell">
-                  <span>Usage</span>
-                  <strong id="detailUsage">{mappedCatalogProduct.meta.usage}</strong>
-                </div>
-                <div className="detail-cell">
-                  <span>Dosage / note</span>
-                  <strong id="detailDosage">{mappedCatalogProduct.meta.dosage}</strong>
-                </div>
-                <div className="detail-cell">
-                  <span>Included</span>
-                  <strong id="detailIncluded">{mappedCatalogProduct.meta.included}</strong>
-                </div>
-                <div className="detail-cell">
-                  <span>Storage</span>
-                  <strong id="detailStorage">{mappedCatalogProduct.meta.storage}</strong>
-                </div>
-              </div>
+                  <div className="products-head no-padding">
+                    <div className="price-block left-align">
+                      <strong id="detailPrice">
+                        {currencySymbols[currency]}{mappedCatalogProduct.prices[currency]}
+                      </strong>
+                      <span id="detailPriceMeta">per kit • tax excluded</span>
+                    </div>
+                    <span className="chip" id="detailCategory">{mappedCatalogProduct.category}</span>
+                  </div>
 
-              <div className="filter-title mb-10">Usage checklist</div>
-              <ul className="usage-list">
-                <li>{mappedCatalogProduct.meta.list1}</li>
-                <li>{mappedCatalogProduct.meta.list2}</li>
-                <li>{mappedCatalogProduct.meta.list3}</li>
-              </ul>
-            </div>
+                  <div className="detail-grid">
+                    <div className="detail-cell">
+                      <span>Usage</span>
+                      <strong id="detailUsage">{mappedCatalogProduct.meta.usage}</strong>
+                    </div>
+                    <div className="detail-cell">
+                      <span>Dosage / note</span>
+                      <strong id="detailDosage">{mappedCatalogProduct.meta.dosage}</strong>
+                    </div>
+                    <div className="detail-cell">
+                      <span>Included</span>
+                      <strong id="detailIncluded">{mappedCatalogProduct.meta.included}</strong>
+                    </div>
+                    <div className="detail-cell">
+                      <span>Storage</span>
+                      <strong id="detailStorage">{mappedCatalogProduct.meta.storage}</strong>
+                    </div>
+                  </div>
 
-            <div className="card padded-16">
-              <h3 className="cart-title">Request item</h3>
+                  <div className="filter-title mb-10">Usage checklist</div>
+                  <ul className="usage-list">
+                    <li>{mappedCatalogProduct.meta.list1}</li>
+                    <li>{mappedCatalogProduct.meta.list2}</li>
+                    <li>{mappedCatalogProduct.meta.list3}</li>
+                  </ul>
+                </div>
 
-              <div className="order-grid mt-16">
-                <div className="field">
-                  <label>Quantity</label>
-                  <div className="qty-stepper">
-                    <button onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
-                    <span className="qty-value">{qty}</span>
-                    <button onClick={() => setQty((q) => q + 1)}>+</button>
+                <div className="card padded-16">
+                  <h3 className="cart-title">Request item</h3>
+
+                  <div className="order-grid mt-16">
+                    <div className="field">
+                      <label>Quantity</label>
+                      <div className="qty-stepper">
+                        <button onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
+                        <span className="qty-value">{qty}</span>
+                        <button onClick={() => setQty((q) => q + 1)}>+</button>
+                      </div>
+                    </div>
+
+                    <div className="field">
+                      <label>Currency</label>
+                      <select value={currency} onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}>
+                        {(['USD', 'KES', 'NGN', 'GHS', 'ZAR', 'AED'] as const).map((cur) => (
+                          <option key={cur} value={cur}>{cur}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="summary-list mt-16">
+                    <div className="summary-row muted">
+                      <span>Unit price</span>
+                      <span>{currencySymbols[currency]}{mappedCatalogProduct.prices[currency]}</span>
+                    </div>
+                    <div className="summary-row total">
+                      <span>Total</span>
+                      <span>{currencySymbols[currency]}{(mappedCatalogProduct.prices[currency] * qty).toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="order-actions mt-18">
+                    <button className="link-btn primary" onClick={handleAddToCart}>Add to cart</button>
+                    <button className="ghost-btn" onClick={onCheckout}>Checkout</button>
                   </div>
                 </div>
-
-                <div className="field">
-                  <label>Currency</label>
-                  <select value={currency} onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}>
-                    {(['USD', 'KES', 'NGN', 'GHS', 'ZAR', 'AED'] as const).map((cur) => (
-                      <option key={cur} value={cur}>{cur}</option>
-                    ))}
-                  </select>
-                </div>
               </div>
-
-              <div className="summary-list mt-16">
-                <div className="summary-row muted">
-                  <span>Unit price</span>
-                  <span>{currencySymbols[currency]}{mappedCatalogProduct.prices[currency]}</span>
-                </div>
-                <div className="summary-row total">
-                  <span>Total</span>
-                  <span>{currencySymbols[currency]}{(mappedCatalogProduct.prices[currency] * qty).toLocaleString()}</span>
-                </div>
+            </>
+          ) : (
+            <div className="card detail-summary">
+              <div className="detail-title">
+                <h2>Product not found</h2>
+                <p>The selected product could not be found or is no longer available.</p>
               </div>
-
               <div className="order-actions mt-18">
-                <button className="link-btn primary" onClick={handleAddToCart}>Add to cart</button>
-                <button className="ghost-btn" onClick={onCheckout}>Checkout</button>
+                <button className="link-btn primary" onClick={() => setShowDetail(false)}>Back to catalog</button>
               </div>
             </div>
-          </div>
+          )}
         </section>
       )}
     </motion.div>

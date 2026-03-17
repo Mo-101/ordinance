@@ -1,0 +1,412 @@
+/**
+ * Neumorphic Dashboard Design System
+ * Enhanced visual components with soft shadows and depth
+ */
+
+:root {
+  --neu-bg: #f5f7fb;
+  --neu-white: #ffffff;
+  --neu-shadow-light: #ffffff;
+  --neu-shadow-dark: #e6e9ef;
+  --neu-text-primary: #4a5568;
+  --neu-text-secondary: #718096;
+  --neu-accent: #005eb8;
+  --neu-success: #16a34a;
+  --neu-warning: #f59e0b;
+  --neu-danger: #ef4444;
+}
+
+body {
+  background-color: var(--neu-bg);
+  color: var(--neu-text-primary);
+}
+
+/* Neumorphic Base Classes */
+.neu-flat {
+  background: var(--neu-white);
+  box-shadow: 8px 8px 16px var(--neu-shadow-dark), 
+             -8px -8px 16px var(--neu-shadow-light);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.neu-pressed {
+  background: var(--neu-white);
+  box-shadow: inset 6px 6px 12px var(--neu-shadow-dark), 
+             inset -6px -6px 12px var(--neu-shadow-light);
+  border-radius: 16px;
+  border: none;
+}
+
+.neu-btn {
+  background: var(--neu-white);
+  box-shadow: 6px 6px 12px var(--neu-shadow-dark), 
+             -6px -6px 12px var(--neu-shadow-light);
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+.neu-btn:hover {
+  box-shadow: 4px 4px 8px var(--neu-shadow-dark), 
+             -4px -4px 8px var(--neu-shadow-light);
+  transform: translateY(-2px);
+}
+
+.neu-btn:active {
+  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), 
+             inset -4px -4px 8px var(--neu-shadow-light);
+  transform: translateY(0);
+}
+
+.neu-btn-primary {
+  background: linear-gradient(145deg, #005eb8, #004a94);
+  color: white;
+  box-shadow: 6px 6px 12px var(--neu-shadow-dark), 
+             -6px -6px 12px var(--neu-shadow-light);
+}
+
+.neu-btn-primary:hover {
+  box-shadow: 4px 4px 8px var(--neu-shadow-dark), 
+             -4px -4px 8px var(--neu-shadow-light);
+  transform: translateY(-2px);
+}
+
+.neu-btn-primary:active {
+  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2), 
+             inset -4px -4px 8px rgba(255,255,255,0.1);
+}
+
+.neu-input {
+  background: var(--neu-white);
+  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), 
+             inset -4px -4px 8px var(--neu-shadow-light);
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.neu-input:focus {
+  box-shadow: inset 6px 6px 12px var(--neu-shadow-dark), 
+             inset -6px -6px 12px var(--neu-shadow-light);
+}
+
+.neu-circle {
+  background: var(--neu-white);
+  box-shadow: 6px 6px 12px var(--neu-shadow-dark), 
+             -6px -6px 12px var(--neu-shadow-light);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.neu-circle:hover {
+  box-shadow: 4px 4px 8px var(--neu-shadow-dark), 
+             -4px -4px 8px var(--neu-shadow-light);
+}
+
+.neu-circle:active {
+  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), 
+             inset -4px -4px 8px var(--neu-shadow-light);
+}
+
+/* Sparkline Charts */
+.sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+}
+
+.sparkline span {
+  flex: 1;
+  background: linear-gradient(180deg, #84aefc, #005eb8);
+  border-radius: 999px;
+  min-width: 4px;
+}
+
+/* Bar Charts */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 200px;
+}
+
+.bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar {
+  width: 100%;
+  max-width: 24px;
+  background: linear-gradient(180deg, #8fb4ff 0%, #005eb8 100%);
+  border-radius: 12px 12px 4px 4px;
+}
+
+.bar.light {
+  background: linear-gradient(180deg, #dbe8ff 0%, #a9c4ff 100%);
+}
+
+/* Donut Charts */
+.donut {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: conic-gradient(#005eb8 0 42%, #4d86ff 42% 69%, #9fbdff 69% 88%, #dbe7ff 88% 100%);
+  position: relative;
+}
+
+.donut::after {
+  content: attr(data-label);
+  white-space: pre;
+  position: absolute;
+  inset: 24px;
+  border-radius: 50%;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-weight: 800;
+  color: var(--neu-text-primary);
+  font-size: 20px;
+  line-height: 1.1;
+  box-shadow: inset 0 0 0 1px #e6e9ef;
+}
+
+/* Flow Step Cards */
+.flow-step {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 4px 4px 12px #e6e9ef, -4px -4px 12px #ffffff;
+}
+
+.step-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #eaf1ff;
+  color: #005eb8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+  font-weight: 800;
+}
+
+/* Gauge Charts */
+.gauge {
+  width: 140px;
+  height: 70px;
+  border-top-left-radius: 140px;
+  border-top-right-radius: 140px;
+  background: conic-gradient(from 180deg, #dce8ff 0 28%, #86adff 28% 55%, #005eb8 55% 74%, #dce8ff 74% 100%);
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto 8px;
+}
+
+.gauge::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -56px;
+  height: 112px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #e6e9ef;
+}
+
+/* Progress Bars */
+.track {
+  width: 100%;
+  height: 8px;
+  background: #edf2fb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8eb3ff, #005eb8);
+}
+
+.fill.danger {
+  background: linear-gradient(90deg, #f79009, #f04438);
+}
+
+/* Line Charts */
+.line-chart {
+  height: 80px;
+  position: relative;
+  background: repeating-linear-gradient(to top, #f3f6fb 0, #f3f6fb 1px, transparent 1px, transparent 20px);
+  border-radius: 8px;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.stable {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.healthy {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.running {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.status-badge.watch {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.ontime {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* KPI Cards */
+.kpi-card {
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-trend {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse 2s infinite;
+}
+
+.kpi-trend.danger {
+  background: #ef4444;
+}
+
+.kpi-trend.warning {
+  background: #f59e0b;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Sidebar Active Item */
+.sidebar-active {
+  background: white;
+  border-radius: 20px 0 0 20px;
+  margin-right: -24px;
+  padding-right: 28px;
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar-active::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: 0;
+  width: 20px;
+  height: 10px;
+  background: #005eb8;
+  border-bottom-right-radius: 20px;
+  z-index: -1;
+}
+
+.sidebar-active::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  right: 0;
+  width: 20px;
+  height: 10px;
+  background: #005eb8;
+  border-top-right-radius: 20px;
+  z-index: -1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .neu-flat {
+    box-shadow: 4px 4px 8px var(--neu-shadow-dark), 
+               -4px -4px 8px var(--neu-shadow-light);
+    border-radius: 16px;
+  }
+
+  .neu-btn {
+    box-shadow: 4px 4px 8px var(--neu-shadow-dark), 
+               -4px -4px 8px var(--neu-shadow-light);
+  }
+
+  .bar-chart {
+    height: 150px;
+  }
+
+  .donut {
+    width: 120px;
+    height: 120px;
+  }
+
+  .donut::after {
+    inset: 16px;
+    font-size: 16px;
+  }
+}
+
+/* Smooth transitions */
+* {
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--neu-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neu-shadow-dark);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}

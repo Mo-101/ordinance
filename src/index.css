@@ -57,3 +57,5 @@
     @apply bg-[#11a7e8] text-white font-black uppercase tracking-wider px-3 py-2 border-t-2 border-white text-xs;
   }
 }
+
+@import "./styles/neumorphic-dashboard.css";

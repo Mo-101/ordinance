@@ -19,8 +19,7 @@ import {
   Headphones,
   ArrowLeft,
 } from 'lucide-react';
-import { Product } from '../types';
-import './ProductDetailView.css';
+import { Product } from '../../types';
 
 interface ProductDetailViewProps {
   product: Product;
